@@ -28,6 +28,7 @@ app.get("/favorite", favoriteHandler);
 app.get("/trending", trendingPageHandler);
 app.post("/addMovie", addMovieHandler);
 app.get("/getMovie/:id", getMovieByIdHandler);
+app.get("/getMovie", getHandler);
 app.get("*", errorHandler);
 
 // Constructor
@@ -101,6 +102,17 @@ function getMovieByIdHandler(req, res) {
         })
         .catch();
 }
+
+function getHandler(req, res) {
+    let sql = "SELECT * from movie;";
+    client
+        .query(sql)
+        .then((result) => {
+            res.json(result.rows);
+        })
+        .catch();
+}
+
 
 // after connection to db, start the server
 client.connect().then(() => {
