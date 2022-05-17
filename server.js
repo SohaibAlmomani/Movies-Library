@@ -29,6 +29,8 @@ app.get("/trending", trendingPageHandler);
 app.post("/addMovie", addMovieHandler);
 app.get("/getMovie/:id", getMovieByIdHandler);
 app.get("/getMovie", getHandler);
+app.put("/updateMovie/:id", updateMovieHandler);
+app.delete("/delete/:id", deleteMovieHandler);
 app.get("*", errorHandler);
 
 // Constructor
@@ -113,7 +115,32 @@ function getHandler(req, res) {
         .catch();
 }
 
+function updateMovieHandler(req, res) {
+    //const { updateName } = req.params;
+    const { name, time, summary, image } = req.body;
+    const { id } = req.params;
+    let sql = `UPDATE movie SET name=$1, time=$2, summary=$3, image=$4 WHERE id = $5 RETURNING *;`; // sql query
+    let values = [name, time, summary, image, id];
+    client
+        .query(sql, values)
+        .then((result) => {
+            return res.status(200).json(result.rows);
+        })
+        .catch();
+}
 
+function deleteMovieHandler(req, res) {
+    const id = req.query.id;
+    let sql = "DELETE FROM movie WHERE id=$1;";
+    let value = [id];
+    client
+        .query(sql, value)
+        .then((result) => {
+            console.log(result);
+            res.send("deleted");
+        })
+        .catch();
+}
 // after connection to db, start the server
 client.connect().then(() => {
     app.listen(port, () => {
